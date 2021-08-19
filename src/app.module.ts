@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
@@ -15,9 +16,18 @@ import { AppService } from './app.service';
       isGlobal: true,
       envFilePath: 'dev.env',
     }),
+    BullModule.forRoot({
+      redis: {
+        host: 'locahost',
+        port: 5000,
+      },
+    }),
     TypeOrmModule.forRoot(),
     ScheduleModule.forRoot(),
     UploadModule,
+    BullModule.registerQueue({
+      name: 'notification-queue',
+    }),
   ],
   controllers: [AppController],
   providers: [
