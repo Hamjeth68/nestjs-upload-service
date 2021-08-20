@@ -1,3 +1,5 @@
+import { NotificationConsumer } from './notification.consumer';
+import { NotificationProducerService } from './notification.producer.service';
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -37,6 +39,8 @@ import { AppService } from './app.service';
       useClass: HttpExceptionFilter,
     },
     AppService,
+    NotificationProducerService,
+    NotificationConsumer,
   ],
 })
 export class AppModule {}
