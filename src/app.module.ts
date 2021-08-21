@@ -1,3 +1,4 @@
+import { FileConsumer } from './file.consumer';
 import { NotificationConsumer } from './notification.consumer';
 import { NotificationProducerService } from './notification.producer.service';
 import { BullModule } from '@nestjs/bull';
@@ -48,6 +49,7 @@ import { FileProducerService } from './file.producer.service';
     NotificationProducerService,
     NotificationConsumer,
     FileProducerService,
+    FileConsumer,
   ],
 })
 export class AppModule {}
