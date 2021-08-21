@@ -6,8 +6,12 @@ import { Queue } from 'bull';
 export class NotificationProducerService {
   constructor(@InjectQueue('notification-queue') private queue: Queue) {}
   async sendMessage(msg: string) {
-    await this.queue.add('notification-job', {
-      text: msg,
-    });
+    await this.queue.add(
+      'notification-job',
+      {
+        text: msg,
+      },
+      { delay: 10000 },
+    );
   }
 }

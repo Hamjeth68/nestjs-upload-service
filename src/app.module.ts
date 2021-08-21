@@ -11,6 +11,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UploadModule } from './modules/upload/upload.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { FileProducerService } from './file.producer.service';
 
 @Module({
   imports: [
@@ -27,9 +28,14 @@ import { AppService } from './app.service';
     TypeOrmModule.forRoot(),
     ScheduleModule.forRoot(),
     UploadModule,
-    BullModule.registerQueue({
-      name: 'notification-queue',
-    }),
+    BullModule.registerQueue(
+      {
+        name: 'notification-queue',
+      },
+      {
+        name: 'file-operation',
+      },
+    ),
   ],
   controllers: [AppController],
   providers: [
@@ -41,6 +47,7 @@ import { AppService } from './app.service';
     AppService,
     NotificationProducerService,
     NotificationConsumer,
+    FileProducerService,
   ],
 })
 export class AppModule {}
