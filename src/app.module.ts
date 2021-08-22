@@ -1,9 +1,7 @@
-// import { FileConsumer } from './file.consumer';
 import { NotificationConsumer } from './notification.consumer';
 import { NotificationProducerService } from './notification.producer.service';
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './core/filters/http-exception.filter';
@@ -12,7 +10,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UploadModule } from './modules/upload/upload.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { FileProducerService } from './file.producer.service';
+import { BullQueueModule } from './modules/bull-queue/bull-queue.module';
 
 @Module({
   imports: [
@@ -20,13 +18,17 @@ import { AppService } from './app.service';
       isGlobal: true,
       envFilePath: 'dev.env',
     }),
-    BullModule.forRoot({
+    /*BullModule.registerQueue({
+      name: 'UPLOAD_QUEUE',
       redis: {
-        host: 'locahost',
-        port: 5000,
+        host: 'localhost',
+        port: 6379,
       },
-    }),
-    TypeOrmModule.forRoot(),
+      defaultJobOptions: {
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
+    }),*/
     ScheduleModule.forRoot(),
     UploadModule,
     BullModule.registerQueue(
@@ -37,6 +39,7 @@ import { AppService } from './app.service';
         name: 'file-operation',
       },
     ),
+    BullQueueModule,
   ],
   controllers: [AppController],
   providers: [
@@ -48,8 +51,6 @@ import { AppService } from './app.service';
     AppService,
     NotificationProducerService,
     NotificationConsumer,
-    // FileProducerService,
-    // FileConsumer,
   ],
 })
 export class AppModule {}
