@@ -7,7 +7,7 @@ import { UploadConsumer } from './upload.consumer';
 @Module({
   imports: [
     BullModule.registerQueue({
-      name: 'UPLOAD_QUEUE',
+      name: 'UPLOAD_QUEUE1',
       redis: {
         host: 'localhost',
         port: 6379,

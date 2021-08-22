@@ -3,6 +3,8 @@ import { UploadService } from './upload.service';
 import { UploadController } from './upload.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bull';
+import { UploadConsumer } from './upload.consumer';
 
 @Module({
   imports: [
@@ -13,8 +15,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService],
     }),
+    BullModule.registerQueue({
+      name: 'UPLOAD_QUEUE',
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+      defaultJobOptions: {
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
+    }),
   ],
   controllers: [UploadController],
-  providers: [UploadService],
+  providers: [UploadConsumer, UploadService],
 })
 export class UploadModule {}
