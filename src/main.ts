@@ -6,6 +6,7 @@ import { HttpExceptionFilter } from './core/filters/http-exception.filter';
 import { AppLogger } from './core/logger/app-logger';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -39,7 +40,7 @@ async function bootstrap() {
   app.setViewEngine('hbs');
 
   app.useGlobalPipes(new ValidationPipe());
-
+  app.useWebSocketAdapter(new WsAdapter(app) as any);
   app.setGlobalPrefix('api');
   await app.listen(5000);
 }

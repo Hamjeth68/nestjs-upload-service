@@ -1,4 +1,4 @@
-import { FileConsumer } from './file.consumer';
+// import { FileConsumer } from './file.consumer';
 import { NotificationConsumer } from './notification.consumer';
 import { NotificationProducerService } from './notification.producer.service';
 import { BullModule } from '@nestjs/bull';
@@ -12,7 +12,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UploadModule } from './modules/upload/upload.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { FileProducerService } from './file.producer.service';
+// import { FileProducerService } from './file.producer.service';
 
 @Module({
   imports: [
@@ -48,8 +48,8 @@ import { FileProducerService } from './file.producer.service';
     AppService,
     NotificationProducerService,
     NotificationConsumer,
-    FileProducerService,
-    FileConsumer,
+    // FileProducerService,
+    // FileConsumer,
   ],
 })
 export class AppModule {}

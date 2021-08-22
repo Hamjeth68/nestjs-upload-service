@@ -7,8 +7,7 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private NotificationProducerService: NotificationProducerService,
-    private FileProducerService: FileProducerService,
+    private NotificationProducerService: NotificationProducerService, // private FileProducerService: FileProducerService,
   ) {}
 
   @Get()
@@ -22,9 +21,9 @@ export class AppController {
     return msg;
   }
 
-  @Get('delete-file')
-  async deleteFile(@Query('fileName') fileName: string) {
-    await this.FileProducerService.deleteFile(fileName);
-    return 'deleted';
-  }
+  // @Get('delete-file')
+  // async deleteFile(@Query('fileName') fileName: string) {
+  //   await this.FileProducerService.deleteFile(fileName);
+  //   return 'deleted';
+  // }
 }
