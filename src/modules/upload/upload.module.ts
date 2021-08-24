@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { UploadService } from './upload.service';
 import { UploadController } from './upload.controller';
 import { MulterModule } from '@nestjs/platform-express';
@@ -25,6 +25,13 @@ import { UploadConsumer } from './upload.consumer';
         removeOnComplete: true,
         removeOnFail: true,
       },
+    }),
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        baseURL: configService.get<string>(''),
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [UploadController],
