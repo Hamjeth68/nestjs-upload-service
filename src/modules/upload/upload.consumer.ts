@@ -8,7 +8,7 @@ export class UploadConsumer {
   @Process()
   async processUploadJob(job: Job, done) {
     // call done when finished
-    console.log('processUploadJob' + job.data.id);
+    console.log('processUploadJob' + job.data.file);
     done();
   }
 }

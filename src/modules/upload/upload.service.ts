@@ -10,7 +10,7 @@ export class UploadService {
   async addToQueue(file) {
     await this.uploadQueue.add(
       {
-        id: '23213213',
+        file: file,
       },
       {
         delay: 60000, // 15Min

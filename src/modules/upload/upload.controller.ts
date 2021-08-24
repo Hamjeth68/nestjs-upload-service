@@ -18,8 +18,9 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
     @Body() data: any,
   ) {
-    return await this.uploadService.addToQueue(file);
     console.log(data);
     console.log(file);
+    return await this.uploadService.addToQueue(file);
+   
   }
 }
