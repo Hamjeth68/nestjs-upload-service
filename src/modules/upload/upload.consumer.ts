@@ -3,6 +3,7 @@ import { Job, Queue } from 'bull';
 import { HttpService } from '@nestjs/common';
 import { Student } from './entities/student.entity';
 import { request, gql } from 'graphql-request'
+import { catchError, map } from 'rxjs/operators';
 
 const xlsxFile = require('read-excel-file/node');
 
@@ -17,6 +18,34 @@ export class UploadConsumer {
   
   async submitToUser(students : Student[]){
 
+
+    const url = `http://localhost:3000/graphql`;
+    const headersRequest = {
+      'Content-Type': 'application/json',
+    };
+    const data = {
+      query:
+        `mutation{
+          createStudent(studentInput:${students}){
+            id
+          }
+        }`,
+    };
+
+     await this.httpService
+      .post(url, data, { headers: headersRequest })
+      .pipe(
+        map((results) => {
+          console.log(results);
+          return true
+        }),
+      )
+      .toPromise()
+      
+      return false
+
+     
+
   
 
     // const query = gql`
@@ -27,13 +56,13 @@ export class UploadConsumer {
     // }
     // `
 
-      const query = gql`
-      mutation createUser($studentArray: Student[]!) { 
-        createStudent(studentInput:$studentArray){
-            id
-        }
-      }
-    `
+    //   const query = gql`
+    //   mutation createUser($studentArray: Student[]!) { 
+    //     createStudent(studentInput:$studentArray){
+    //         id
+    //     }
+    //   }
+    // `
 
   //    const query = gql`
   //    query getMovie($title: String!) {
@@ -46,35 +75,20 @@ export class UploadConsumer {
   //    }
   //  `
  
-   const variables = {
-    studentArray: students
-   }
+  //  const variables = {
+  //   studentArray: students
+  //  }
  
-    // mutation{
-    //   createStudent(studentInput:[{
-    //     name: "eshan22",
-    //     dob: "1993-11-12",
-    //     email:"eshanwp@gmail.com",
-    //     age: 28
-    //   },
-    //   {
-    //     name: "eshan23",
-    //     dob: "1993-11-12",
-    //     email:"eshanwp@gmail.com",
-    //     age: 28
-    //   }]){
-    //     id
-    //   }
-    // }
+   
 
-    try {   
-      const data =  await request('http://localhost:3000/graphql',query,variables)
-      console.log(JSON.stringify(data, undefined, 2))
-      return true
-    } catch (error) {
-      console.error(JSON.stringify(error, undefined, 2))
-      return false
-    }
+    // try {   
+    //   const data =  await request('http://localhost:3000/graphql',query,variables)
+    //   console.log(JSON.stringify(data, undefined, 2))
+    //   return true
+    // } catch (error) {
+    //   console.error(JSON.stringify(error, undefined, 2))
+    //   return false
+    // }
  
 
 
