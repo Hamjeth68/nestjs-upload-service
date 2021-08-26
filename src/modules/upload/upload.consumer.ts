@@ -15,16 +15,69 @@ export class UploadConsumer {
   ) {}
 
   
-  submitToUser(students : Student[]){
+  async submitToUser(students : Student[]){
 
-    // const query = gql`mutation{createStudent(studentInput:students){id}`
-    // return request(`http://localhost:3000/graphql`,query,students).then((data) => {
-    //     console.log('submit  user success ',data)
-    //     return true
-    // }, () => {
-    //   return false
-    // });
-    return true
+  
+
+    // const query = gql`
+    //  mutation{
+    //   createStudent(studentInput:${student}){
+    //     id
+    //   }
+    // }
+    // `
+
+      const query = gql`
+      mutation createUser($studentArray: Student[]!) { 
+        createStudent(studentInput:$studentArray){
+            id
+        }
+      }
+    `
+
+  //    const query = gql`
+  //    query getMovie($title: String!) {
+  //      Movie(title: $title) {
+  //        releaseDate
+  //        actors {
+  //          name
+  //        }
+  //      }
+  //    }
+  //  `
+ 
+   const variables = {
+    studentArray: students
+   }
+ 
+    // mutation{
+    //   createStudent(studentInput:[{
+    //     name: "eshan22",
+    //     dob: "1993-11-12",
+    //     email:"eshanwp@gmail.com",
+    //     age: 28
+    //   },
+    //   {
+    //     name: "eshan23",
+    //     dob: "1993-11-12",
+    //     email:"eshanwp@gmail.com",
+    //     age: 28
+    //   }]){
+    //     id
+    //   }
+    // }
+
+    try {   
+      const data =  await request('http://localhost:3000/graphql',query,variables)
+      console.log(JSON.stringify(data, undefined, 2))
+      return true
+    } catch (error) {
+      console.error(JSON.stringify(error, undefined, 2))
+      return false
+    }
+ 
+
+
   }
 
   @Process()
@@ -57,11 +110,10 @@ export class UploadConsumer {
   console.log('error',error)
   }
    
-  console.log('student',student)
 
   if(student.length > 0) 
    {
-        let success = this.submitToUser(student)
+        let success = await this.submitToUser(student)
         if(success)  { done() } else { return false  }
   
     }
