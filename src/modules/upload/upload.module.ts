@@ -5,13 +5,18 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
 import { UploadConsumer } from './upload.consumer';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Module({
   imports: [
     MulterModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({
-        dest: config.get('MULTER_DEST'),
+        storage: diskStorage({
+            destination: './uploads',
+            filename: editFileName,
+        }),
       }),
       inject: [ConfigService],
     }),
@@ -38,3 +43,14 @@ import { UploadConsumer } from './upload.consumer';
   providers: [UploadConsumer, UploadService],
 })
 export class UploadModule {}
+
+
+export const editFileName = (req, file, callback) => {
+  const name = file.originalname.split('.')[0];
+  const fileExtName = extname(file.originalname);
+  const randomName = Array(4)
+    .fill(null)
+    .map(() => Math.round(Math.random() * 16).toString(16))
+    .join('');
+  callback(null, `${name}-${randomName}${fileExtName}`);
+};

@@ -11,11 +11,7 @@ export class UploadService {
     await this.uploadQueue.add(
       {
         file: file,
-      },
-      {
-        delay: 60000, // 15Min
-        attempts: 1,
-      },
+      }
     );
   }
 
