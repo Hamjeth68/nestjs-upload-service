@@ -9,6 +9,9 @@ import { Job, Queue } from 'bull';
 import { HttpService } from '@nestjs/common';
 import { Student } from './entities/student.entity';
 import { map } from 'rxjs/operators';
+import { gql, request } from 'graphql-request';
+import {} from 'socketcluster-client';
+import * as SC from 'socketcluster-client';
 
 const xlsxFile = require('read-excel-file/node');
 
@@ -17,73 +20,38 @@ export class UploadConsumer {
   constructor(
     @InjectQueue('UPLOAD_QUEUE') private genieQueue: Queue,
     private readonly httpService: HttpService,
-  ) {}
+  ) {
+
+  }
 
   async submitToUser(students: Student[]) {
-    const url = `http://localhost:3000/graphql`;
-    const headersRequest = {
-      'Content-Type': 'application/json',
+    const query = gql`
+      mutation createUser($studentArray: [StudentCreateDTO!]!) {
+        createStudent(studentInput: $studentArray) {
+          id
+        }
+      }
+    `;
+
+    const variables = {
+      studentArray: students,
     };
-    console.log(JSON.stringify(students).replace(/"(\w+)"\s*:/g, '$1:'));
-    const body = JSON.stringify(students).replace(/"(\w+)"\s*:/g, '$1:');
-    const data = {
-      query: `mutation{createStudent(studentInput:${body}){id}}`,
-    };
 
-    await this.httpService
-      .post(url, data, { headers: headersRequest })
-      .pipe(
-        map((results) => {
-          console.log(results);
-        }),
-      )
-      .toPromise();
-
-    return false;
-
-    // const query = gql`
-    //  mutation{
-    //   createStudent(studentInput:${student}){
-    //     id
-    //   }
-    // }
-    // `
-
-    //   const query = gql`
-    //   mutation createUser($studentArray: Student[]!) {
-    //     createStudent(studentInput:$studentArray){
-    //         id
-    //     }
-    //   }
-    // `
-
-    //    const query = gql`
-    //    query getMovie($title: String!) {
-    //      Movie(title: $title) {
-    //        releaseDate
-    //        actors {
-    //          name
-    //        }
-    //      }
-    //    }
-    //  `
-
-    //  const variables = {
-    //   studentArray: students
-    //  }
-
-    // try {
-    //   const data =  await request('http://localhost:3000/graphql',query,variables)
-    //   console.log(JSON.stringify(data, undefined, 2))
-    //   return true
-    // } catch (error) {
-    //   console.error(JSON.stringify(error, undefined, 2))
-    //   return false
-    // }
+    try {
+      const data = await request(
+        'http://localhost:3000/graphql',
+        query,
+        variables,
+      );
+      return  data
+    } catch (error) {
+      console.error(JSON.stringify(error, undefined, 2));
+      return error;
+    }
   }
 
   @Process()
-  async processUploadJob(job: Job, done) {
+  async processUploadJob(job: Job) {
     let student: Student[] = [];
 
     const fileName = job.data.file.filename;
@@ -113,11 +81,7 @@ export class UploadConsumer {
 
     if (student.length > 0) {
       let success = await this.submitToUser(student);
-      if (success) {
-        done();
-      } else {
-        return false;
-      }
+      return  success
     }
   }
 
@@ -135,29 +99,24 @@ export class UploadConsumer {
   @OnQueueCompleted()
   async onSubmitUser(job: Job, result: any) {
     // call done when finished
+    let socket = SC.create({
+      hostname: 'localhost',
+      port: 8000,
+    });
+
+    (async () => {
+      try {
+       
+        await socket.invokePublish(
+          'fileUploadChannel',
+          `Completed job with result ${result}`,
+        );
+        console.log(result);
+      } catch (error) {
+        console.log(error, '--error from cluster server');
+      }
+    })();
+    console.log(`Completed job with result ${result}`);
     console.log('processUploadJob' + job.data.file);
   }
-
-  /*@Process()
-  async processUploadJob(job: Job, done) {
-    const url = `http://localhost:3000/graphql`;
-    const headersRequest = {
-      'Content-Type': 'application/json',
-    };
-    const data = {
-      query:
-        'mutation{\n  createStudent(studentInput:{\n    name: "eshan933173",\n    dob: "1993-11-12",\n    email:"eshanwp@gmail.com",\n    age: 28\n  }){\n    id,\n    name,\n    dob,\n    email,\n    age\n  }\n}',
-    };
-
-    await this.httpService
-      .post(url, data, { headers: headersRequest })
-      .pipe(
-        map((results) => {
-          console.log(results);
-        }),
-      )
-      .toPromise();
-    // call done when finished
-    done();
-  }*/
 }

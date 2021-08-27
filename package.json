@@ -57,6 +57,7 @@
     "rxjs": "^6.6.6",
     "soap": "^0.39.0",
     "socketcluster-client": "^16.0.4",
+    "socketcluster-server": "^16.1.0",
     "swagger-ui-express": "^4.1.6",
     "typeorm": "^0.2.32"
   },
